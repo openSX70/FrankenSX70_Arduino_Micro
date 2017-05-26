@@ -62,7 +62,11 @@ const int GREENled = A5;
 //selectorPOSITION is the position of the selector, we assign speeds with ShutterSpeed
 int ActualSlot;
 //These are the actual speed in ms
-int ShutterSpeed[] = {0, 1000, 500, 250, 125, 66, 33, 16, 8, 0};
+
+//int ShutterSpeed[] = {0, 1000, 500, 250, 125, 66, 33, 16, 8, 0};
+//inversed wheel
+int ShutterSpeed[] = {0, 8, 16, 33, 66, 125, 250, 500, 1000, 0};
+
 
 int shots = 0;
 byte brightness = 160;
@@ -120,18 +124,20 @@ void setup() {
   motorON ();
   motorOFF();
   }
-}
+
+  }
 
 
 void loop() {
+
   
   //WHAT TO DO WHEN POWER-UP:
   //  S8     S9
   //closed  open  --> EJECT DARKSLIDE (DEFAULT)
   // open  closed --> FILM REACH 0 (NO FLASH)
   // open   open  --> NORMAL OPERATION 10 TO 1
-
-  // STATE 1: EJECT DARKSLIDE:
+ 
+    // STATE 1: EJECT DARKSLIDE:
   if (digitalRead(S8) == HIGH && digitalRead(S9) == LOW)
     //EJECT DARK SLIDE
   {
@@ -146,7 +152,9 @@ void loop() {
   {
     //analogWrite (GREENled, 60);
     //analogWrite (REDled, 0);
-  }
+
+}
+
   //STATE 3: NORMAL OPERATION
   if (digitalRead(S8) == LOW && digitalRead(S9) == LOW)
   {
@@ -197,9 +205,11 @@ void loop() {
         Click ();                                // NOW I am going to take the picture: SMILE!
         analogWrite (REDled, brightness);    //shots taken
 
-        delay (100);                             //AGAIN is this delay necessary?
+        delay (200);                             //AGAIN is this delay necessary?
         
         mirrorDOWN ();                          //Motor starts, let bring the mirror DOWN
+
+        delay (200);                             //AGAIN is this delay necessary?
 
         shutterOPEN();
        
@@ -253,6 +263,9 @@ void loop() {
               shots = 0;
  
             mirrorDOWN ();
+
+            delay (200);                             //AGAIN is this delay necessary?
+
             shutterOPEN();    
 
            }   // end of if (digitalRead(S1) == HIGH && digitalRead(Selector) ==  LOW && shots > 1)  //Was in DOUBLE EXPOSURE MODE but NOW is back to NORMAL
