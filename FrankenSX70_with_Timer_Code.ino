@@ -400,7 +400,7 @@ void Click()
 
 }
 
-void TimerClick()
+void S1Press()
 {
 // RED LED USED FOR DEBUGGING PURPOSES
 // const int REDled = A4;
@@ -409,16 +409,16 @@ void TimerClick()
 // const int S1 = 2; //Red S1 SHUTTER RELEASE
 boolean S1State1 = false;
 boolean S1State2 = false;
+//Serial.begin(9600) ;
 
 long S1Timer = 0;
 long longPressTime = 1000;
 //int x;
 boolean S1Active = false;
 boolean longPressActive = false;
-
 {
 
-  if (digitalRead(S1) == HIGH) {
+  if (digitalRead(S1) == LOW) {
 
     if (S1Active == false) {
 
@@ -433,28 +433,13 @@ boolean longPressActive = false;
       S1State1 = !S1State1;
       // digitalWrite(REDled, S1State1);
       //long press
-        Serial.println("LONG\n");
-        
-        //delay (500);
-
-                              
-                             for( int x = 0; x<80; x++)
-                            {
-                            digitalWrite(REDled, HIGH);   // sets the LED on
-                            delay(150-x);                  // waits a period of time
-                            digitalWrite(REDled, LOW);    // sets the LED off
-                            delay(100-x);                  // waits a period of time
-                              Serial.println(x);
-                            }
-
-
-
-     
-
-                            digitalWrite(REDled, HIGH);   // sets the LED on
-                            delay(2000);                  // waits a period of time
-                            digitalWrite(REDled, LOW);  
-
+      CLICKtype = 1;
+      // BLINKING LED CODE HERE
+      delay (10000);
+      // ---
+      return;
+  //                                                                                Serial.println("LONG\n");
+    
     }
 
   } else {
@@ -470,14 +455,9 @@ boolean longPressActive = false;
         S1State2 = !S1State2;
         //digitalWrite(LED2, S1State2);
         //short press
-        Serial.println("SHORT\n");
-
-        digitalWrite(REDled, HIGH);   // sets the LED on
-        delay(2000);                  // waits a period of time
-        digitalWrite(REDled, LOW);  
-
-      
-      //  delay (500);
+        //Serial.println("SHORT\n");
+       
+      return;
       }
 
       S1Active = false;
@@ -492,5 +472,4 @@ boolean longPressActive = false;
 
 
 //----------------------------------------------------------------------------------------
-
 
