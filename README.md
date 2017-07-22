@@ -27,3 +27,7 @@ Arduino code for "Franken"SX70 camera
 +been accomplished, for example by the amazing MiNT SLR-670S. This is something else, more like
 +an experimenters tool.
 +I hope to have a decent enough code soon and publish it, and also an schematic.
+
+OpenSX70 is under CC license: Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+https://creativecommons.org/licenses/by-nc/4.0/
