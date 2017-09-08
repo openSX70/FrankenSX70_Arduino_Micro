@@ -7,6 +7,9 @@
 //This will work with "normal" arduinos (UNO etc...)
 //Remember: you have been warned!
 
+//ADDED timer function: shortPress and longPress control the timer function: shortPress = just take a picture
+//                                                                       but longPress = 10 seconds delay (or whatever you define)
+
 // FIRST I ASSIGN THE Sx SWITCHES OF THE SX70 TO PINS ON THE ARDUINO
 // THESE ARE INPUTS
 // SX70-ARDUINO LOGICAL EQUIVALENTS
@@ -58,6 +61,7 @@ const int REDled = A4;
 // GREEN LED USED FOR DEBUGGING PURPOSES
 const int GREENled = A5;
 
+bool takePicture = false;
 
 //selectorPOSITION is the position of the selector, we assign speeds with ShutterSpeed
 int ActualSlot;
@@ -70,6 +74,19 @@ int ShutterSpeed[] = {0, 8, 16, 33, 66, 125, 250, 500, 1000, 0};
 
 int shots = 0;
 byte brightness = 160;
+
+
+         // Lets define what is considered a longPress and a shortPress
+         // shortPress is when you want to take a "regular" picture
+         // it needs to be timed for debounce purposes, that is, you need a "solid" press to take a picture
+  
+  const int shortPress = 150;
+  
+         //longPress is when you want to "something else", in my case delay the taking of the picture for x (10) seconds.
+         //since 1000ms = 1 seconds, this is just a bit more than 1 second.
+
+  const int  longPress = 1200;
+
 
 void setup() {
   // this code only runs once:
@@ -184,9 +201,36 @@ void loop() {
      *  SHOTS >= 1
      */
 
+            int pressTime = REDbutton(S1);
+  
+            if ((pressTime > shortPress) && (pressTime < longPress)) {
+  
+              Serial.println("---------------------------");
+              Serial.print ("SHORT:");
+              Serial.println (pressTime);
+              Serial.println("---------------------------");
 
-    // CASE 1 NORMAL OPERATION: FULL CYCLE
-    if (digitalRead(S1) == LOW && digitalRead(Selector) ==  HIGH && shots == 0)          //NORMAL OPERATION
+            takePicture = true;
+              
+            }  // END OF if ((pressTime > shortPress) && (pressTime < longPress)) {
+            
+            else if (pressTime > longPress) {
+              
+              Serial.println("---------------------------");
+              Serial.print ("LONG: ");
+              Serial.println (pressTime);
+              Serial.println("---------------------------");
+              
+            timerDelay(); 
+            takePicture = true;
+
+            }   // END Of else if (pressTime > longPress) {
+
+            
+           
+
+    
+    if (takePicture == true && digitalRead(Selector) ==  HIGH && shots == 0)          //NORMAL OPERATION
      {
           analogWrite (GREENled, 0);  //selector NORMAL just take a picture and EJECT
 
@@ -273,9 +317,126 @@ void loop() {
 
     }// end of if (digitalRead(S8) == LOW && digitalRead(S9) == LOW)
 
-} //END OF loop
+} //END OF loop      
 
-//HERE GO MY FUNCIONS
+
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+
+//                                HERE GO MY FUNCIONS
+
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+
+void timerDelay() {
+  // this is a test function to do the progressing blinking of the LED using my blink function
+  // it last exactly 10 seconds (2500x4) and I could not accomplish this with the delay() 
+  // everytime the led (in pin 5) blinks faster 1000, 700, 400, and 100.
+unsigned long startTimer = millis();
+Serial.println ("Start TIMER countdown: ");
+Serial.println ("START 700,2500,5 = SLOW BlINK");
+blink (700,2500,REDled);
+;
+Serial.println ("START 500,2500,5 = MEDIUM-SLOW BlINK");
+blink (500,2500,REDled);
+;
+Serial.println ("START 200,2500,5 = MEDIUM-FAST BlINK");
+blink (200,2500,REDled);
+;
+Serial.println ("START 100,2500,5 = FAST BlINK");
+blink (100,2500,REDled);
+;
+Serial.println ("END");
+
+unsigned long endTimer = millis();
+
+unsigned long time = ((endTimer-startTimer)/1000);
+;
+Serial.println ("===========================");
+Serial.print ("TIME:   ");
+Serial.print(time);
+Serial.println ("  seconds  ");
+Serial.println ("===========================");
+
+
+            takePicture = false;
+            
+} // END of timerDelay
+
+
+int blink (int interval, int timer, int ledPin)
+// blink (blink interval=blinking speed, timer=duration blinking, ledPin=pin of LED)
+// blink is a standalone function
+{
+
+
+int ledState = LOW;             // ledState used to set the LED
+pinMode(ledPin, OUTPUT);
+  
+unsigned long previousMillis = 0;        // will store last time LED was updated
+
+unsigned long currentMillisTimer = millis();
+  
+  while (millis() < (currentMillisTimer + timer)) 
+  
+  {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(ledPin, ledState);
+  }
+  }
+} //   END OF blink FUNCTION
+
+
+int REDbutton(int button) {
+    
+    // REDbutton (button pin)
+    // REDbutton is a standalone function
+    // by Joaquín de Prada
+  
+// REDbutton variables  
+static boolean buttonActive = false;
+static unsigned long buttonTimer = 0;
+static unsigned long STARTbuttonTimer = 0 ;
+// END of REDbutton variables
+    
+    pinMode(button, INPUT);
+ 
+    
+int result= 0 ;
+
+if (digitalRead(button) == LOW) {
+            if (buttonActive == false) {
+           Serial.println("button pressed");
+            STARTbuttonTimer = millis(); 
+            buttonActive = true ;
+                                        }
+     
+     } else  {
+
+
+      if (buttonActive == true) {
+            buttonTimer = millis();
+            Serial.println("button just released");
+            Serial.print("pressed time inside function:  ");
+            result = (buttonTimer - STARTbuttonTimer);
+            Serial.println(result);
+            buttonActive = false ;
+     }
+     }
+                      return result;
+
+     } // END OF REDbutton function
+     
 void motorON()
 {
   digitalWrite(Motor, HIGH);
